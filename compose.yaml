@@ -1,0 +1,13 @@
+
+services:
+  web:
+    build: .
+    container_name: vehicle-rental-app
+    ports:
+      - "5001:5001"
+    environment:
+      DATA_DIR: /app/data
+      SECRET_KEY: ${SECRET_KEY:-local-demo-key}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

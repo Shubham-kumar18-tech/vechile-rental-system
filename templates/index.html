@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VehicleRent - Vehicle Rental System</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="#home" class="logo">VehicleRent</a>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#vehicles">Vehicles</a>
+        <a href="#booking">Booking</a>
+        <a href="#my-bookings">My Bookings</a>
+    </nav>
+</header>
+
+<section class="hero" id="home">
+    <h1>Find Your Perfect Ride</h1>
+    <p>Rent cars and bikes easily at affordable prices.</p>
+    <a href="#vehicles" class="main-btn">Explore Vehicles</a>
+</section>
+
+<main>
+<section id="vehicles" class="section">
+    <h2>Available Vehicles</h2>
+    <p class="subtitle">Choose your ride.</p>
+
+    <div class="filters">
+        <input type="search" id="search" placeholder="Search vehicle...">
+        <select id="vehicleType">
+            <option value="all">All Vehicles</option>
+            <option value="Scooter">Scooters</option>
+            <option value="Bike">Bikes</option>
+            <option value="Car">Cars</option>
+        </select>
+    </div>
+
+    <div class="vehicles" id="vehicleList">
+        {% for v in vehicles %}
+        <article class="card"
+                 data-name="{{ v.name }}"
+                 data-type="{{ v.type }}">
+            <div class="vehicle-icon">{{ v.icon }}</div>
+            <h3>{{ v.name }}</h3>
+            <p>{{ v.type }}</p>
+            <p class="price">
+                ₹{{ "{:,}".format(v.price) }} <span>/ day</span>
+            </p>
+            <button type="button" class="book-btn"
+                    data-id="{{ v.id }}"
+                    data-name="{{ v.name }}"
+                    data-price="{{ v.price }}">
+                Book Now
+            </button>
+        </article>
+        {% endfor %}
+    </div>
+    <p id="noResults" hidden>No vehicles found.</p>
+</section>
+
+<section id="booking" class="section booking-section">
+    <h2>Book Your Vehicle</h2>
+    <p class="subtitle">Enter your details.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="notice" role="status">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form id="bookingForm" method="POST" action="{{ url_for('book') }}">
+        <label for="customerName">Your Name</label>
+        <input type="text" id="customerName" name="customer_name"
+               maxlength="100" required>
+
+        <label for="vehicleName">Selected Vehicle</label>
+        <input type="text" id="vehicleName" readonly required>
+        <input type="hidden" id="vehicleId" name="vehicle_id" required>
+
+        <label for="pickupDate">Pickup Date</label>
+        <input type="date" id="pickupDate" name="pickup_date"
+               min="{{ today }}" required>
+
+        <label for="returnDate">Return Date</label>
+        <input type="date" id="returnDate" name="return_date"
+               min="{{ today }}" required>
+
+        <p id="priceSummary">Select a vehicle and dates to see the estimate.</p>
+
+        <button type="submit" class="main-btn">
+            Confirm Demo Booking
+        </button>
+    </form>
+</section>
+
+<section id="my-bookings" class="section">
+    <h2>My Bookings</h2>
+    <p class="subtitle">
+        This demo shows all bookings saved in the shared database,
+        not only one customer's bookings.
+    </p>
+
+    <div id="bookingList">
+        {% if bookings %}
+            {% for b in bookings %}
+            <article class="booking-item">
+                <h3>{{ b.vehicle_name }}</h3>
+                <p>Booking ID: {{ b.id }}</p>
+                <p>Customer: {{ b.customer_name }}</p>
+                <p>Pickup: {{ b.pickup_date }}</p>
+                <p>Return: {{ b.return_date }}</p>
+                <p>Duration: {{ b.days }} day(s)</p>
+                <p>Estimated total: ₹{{ "{:,}".format(b.total) }}</p>
+                <p>Status: {{ b.status }}</p>
+            </article>
+            {% endfor %}
+        {% else %}
+            <p class="subtitle">No bookings yet. Create your first demo booking!</p>
+        {% endif %}
+    </div>
+</section>
+</main>
+
+<footer>
+    <p>Online Vehicle Rental System | College Project</p>
+    <p>Demo only — no real payment or confirmed commercial rental.</p>
+</footer>
+
+</body>
+</html>
